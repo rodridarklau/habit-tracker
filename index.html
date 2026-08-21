@@ -3,68 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HabitFlow - Tracker Profesional de Hábitos</title>
+  <title>HabitFlow Elite - Performance & Habit Tracker</title>
+  <!-- Fuentes profesionales deportivas/técnicas -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <div class="container">
-    <header class="app-header">
-      <div class="header-tag">Productividad & Enfoque</div>
-      <h1>HabitTracaker</h1>
-      <p id="current-date-text">Cargando fecha...</p>
+
+  <div class="app-layout">
+    <!-- Banner Superior Hero -->
+    <header class="hero-banner">
+      <div class="hero-overlay"></div>
+      <img class="hero-bg-img" src="https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1200&q=80" alt="Fitness Training">
+      
+      <div class="hero-content">
+        <div class="hero-top-row">
+          <div class="user-chip" id="profile-trigger">
+            <img id="user-avatar-img" src="https://api.dicebear.com/7.x/bottts/svg?seed=Felix" alt="Athlete Avatar">
+            <div>
+              <span class="athlete-name" id="user-name">ATLETA #01</span>
+              <span class="athlete-rank" id="user-level">NIVEL 1 • RECLUTA</span>
+            </div>
+          </div>
+          <button class="btn-settings" id="edit-profile-btn" title="Configurar Perfil">⚙</button>
+        </div>
+
+        <div class="hero-main-title">
+          <div class="status-indicator">
+            <span class="pulse-dot"></span> MODO DISCIPLINA ACTIVO
+          </div>
+          <h1>HABITTRACKER<span>PRO</span></h1>
+          <p id="current-date-text">Cargando fecha...</p>
+        </div>
+      </div>
     </header>
 
-    <main class="main-content">
-      <!-- Formulario para agregar hábitos con categorías -->
-      <section class="card habit-form-section">
-        <h2>Nuevo Hábito</h2>
+    <main class="main-body">
+      <!-- Grid de Métricas de Rendimiento (Estilo Whoop / Strava) -->
+      <section class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-label">CUMPLIMIENTO</span>
+          <div class="stat-value-row">
+            <span class="stat-number" id="progress-percentage">0%</span>
+          </div>
+          <div class="mini-progress-track">
+            <div class="mini-progress-fill" id="progress-bar-fill"></div>
+          </div>
+        </div>
+
+        <div class="stat-card highlight">
+          <span class="stat-label">RACHA RÉCORD</span>
+          <div class="stat-value-row">
+            <span class="stat-number neon-text" id="streak-stat">0</span>
+            <span class="stat-unit">DÍAS</span>
+          </div>
+          <span class="stat-sub">🔥 Máxima consistencia</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-label">ENERGÍA (XP)</span>
+          <div class="stat-value-row">
+            <span class="stat-number" id="xp-display">0</span>
+            <span class="stat-unit">XP</span>
+          </div>
+          <span class="stat-sub" id="xp-text">0 / 100 para Lv. Up</span>
+        </div>
+      </section>
+
+      <!-- Formulario de Registro Rápido -->
+      <section class="action-card">
+        <div class="card-tag">CREAR OBJETIVO DIARIO</div>
         <form id="habit-form">
-          <div class="input-row">
+          <div class="input-stack">
             <input 
               type="text" 
               id="habit-input" 
-              placeholder="Ej. Leer 20 páginas, Estudiar algoritmos..." 
-              autocomplete="off"
+              placeholder="Ej. 10.000 pasos, 3L agua, Leer 30 min..." 
+              autocomplete="off" 
               required
             >
-            <select id="habit-category" required>
-              <option value="Estudio">📚 Estudio</option>
-              <option value="Salud">💪 Salud / Fitness</option>
-              <option value="Productividad">⚡ Productividad</option>
-              <option value="Bienestar">🧘 Bienestar</option>
+            <select id="habit-category">
+              <option value="Entrenamiento">⚡ ENTRENAMIENTO / GYM</option>
+              <option value="Nutricion">🥗 NUTRICIÓN & AGUA</option>
+              <option value="Enfoque">🧠 ENFOQUE / ESTUDIO</option>
+              <option value="Recuperacion">💤 RECUPERACIÓN</option>
             </select>
           </div>
-          <button type="submit" id="add-btn">Crear Hábito</button>
+          <button type="submit" class="btn-volt" id="add-btn">
+            REGISTRAR HÁBITO +
+          </button>
         </form>
       </section>
 
-      <!-- Panel de Estadísticas -->
-      <section class="card progress-section">
-        <div class="progress-header">
-          <h2>Rendimiento Diario</h2>
-          <span id="progress-percentage">0%</span>
+      <!-- Control de Filtros -->
+      <div class="filter-strip">
+        <span class="filter-title">REGISTRO DE HÁBITOS</span>
+        <div class="filter-buttons">
+          <button class="f-btn active" data-filter="all">TODOS</button>
+          <button class="f-btn" data-filter="pending">PENDIENTES</button>
+          <button class="f-btn" data-filter="completed">COMPLETOS</button>
         </div>
-        <div class="progress-bar-container">
-          <div id="progress-bar-fill" class="progress-bar-fill"></div>
-        </div>
-        <div class="stats-footer">
-          <span id="progress-text">0 de 0 completados</span>
-          <span id="active-streak-count">🔥 Racha activa: 0 días</span>
-        </div>
-      </section>
-
-      <!-- Barra de Filtros -->
-      <section class="filters-container">
-        <button class="filter-btn active" data-filter="all">Todos</button>
-        <button class="filter-btn" data-filter="pending">Pendientes</button>
-        <button class="filter-btn" data-filter="completed">Completados</button>
-      </section>
+      </div>
 
       <!-- Lista de Hábitos -->
-      <section class="habits-list-section">
-        <ul id="habits-list" class="habits-list"></ul>
-      </section>
+      <ul id="habits-list" class="habits-stack"></ul>
     </main>
+  </div>
+
+  <!-- Modal Perfil Atleta -->
+  <div class="modal-overlay" id="profile-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>PERFIL DE ATLETA</h3>
+        <button class="close-btn" id="close-modal-btn">✕</button>
+      </div>
+      <div class="avatar-select-area">
+        <label>ELIGE TU AVATAR:</label>
+        <div class="avatars-row">
+          <img class="avatar-pick selected" data-seed="Ares" src="https://api.dicebear.com/7.x/bottts/svg?seed=Ares" alt="Ares">
+          <img class="avatar-pick" data-seed="Titan" src="https://api.dicebear.com/7.x/bottts/svg?seed=Titan" alt="Titan">
+          <img class="avatar-pick" data-seed="Volt" src="https://api.dicebear.com/7.x/bottts/svg?seed=Volt" alt="Volt">
+          <img class="avatar-pick" data-seed="Rogue" src="https://api.dicebear.com/7.x/bottts/svg?seed=Rogue" alt="Rogue">
+        </div>
+      </div>
+      <div class="field-group">
+        <label for="profile-name-input">NOMBRE / ATLETA ID:</label>
+        <input type="text" id="profile-name-input" placeholder="Tu nombre">
+      </div>
+      <button class="btn-volt" id="save-profile-btn">GUARDAR CAMBIOS</button>
+    </div>
   </div>
 
   <script src="js/app.js"></script>
