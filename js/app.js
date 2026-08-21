@@ -1,15 +1,22 @@
-// Mensaje de comprobación en consola para verificar que el archivo está bien enlazado
-console.log("HabitFlow: Base del proyecto cargada exitosamente.");// 1. Selección de elementos del DOM (Document Object Model)
+// 1. Selección de elementos del DOM
 const habitForm = document.getElementById('habit-form');
 const habitInput = document.getElementById('habit-input');
 const habitsList = document.getElementById('habits-list');
 
-// 2. Estado de la aplicación: arreglo en memoria donde viven los hábitos
-let habits = [];
+// 2. Clave única para guardar en el almacenamiento del navegador
+const STORAGE_KEY = 'habitflow_habits';
 
-// 3. Función para renderizar (dibujar) los hábitos en el HTML
+// 3. Cargar hábitos iniciales desde localStorage (si no hay nada guardado, inicia como arreglo vacío [])
+let habits = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+// 4. Función para guardar el estado actual de los hábitos en localStorage
+function saveHabitsToStorage() {
+  // localStorage solo guarda texto plano (strings), por eso convertimos el arreglo a formato JSON
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(habits));
+}
+
+// 5. Función para renderizar los hábitos en el HTML
 function renderHabits() {
-  // Limpiamos la lista para no duplicar elementos al redibujar
   habitsList.innerHTML = '';
 
   if (habits.length === 0) {
@@ -18,7 +25,6 @@ function renderHabits() {
   }
 
   habits.forEach((habit) => {
-    // Creamos el elemento <li> para cada hábito
     const li = document.createElement('li');
     li.className = `habit-card ${habit.completed ? 'completed' : ''}`;
 
@@ -39,30 +45,28 @@ function renderHabits() {
   });
 }
 
-// 4. Función para manejar el envío del formulario
+// 6. Manejo del formulario
 habitForm.addEventListener('submit', (event) => {
-  event.preventDefault(); // Evita que la página se recargue
+  event.preventDefault();
 
   const habitName = habitInput.value.trim();
   if (habitName === '') return;
 
-  // Creamos el objeto del nuevo hábito
   const newHabit = {
-    id: Date.now(), // Identificador único basado en la marca de tiempo
+    id: Date.now(),
     name: habitName,
     completed: false,
     streak: 0
   };
 
-  // Agregamos al arreglo y limpiamos el input
   habits.push(newHabit);
+  saveHabitsToStorage(); // <-- Guardamos en localStorage
   habitInput.value = '';
 
-  // Actualizamos la vista
   renderHabits();
 });
 
-// 5. Función para alternar el estado de completado
+// 7. Alternar completado
 function toggleHabit(id) {
   habits = habits.map((habit) => {
     if (habit.id === id) {
@@ -76,14 +80,16 @@ function toggleHabit(id) {
     return habit;
   });
 
+  saveHabitsToStorage(); // <-- Guardamos en localStorage
   renderHabits();
 }
 
-// 6. Función para eliminar un hábito
+// 8. Eliminar hábito
 function deleteHabit(id) {
   habits = habits.filter((habit) => habit.id !== id);
+  saveHabitsToStorage(); // <-- Guardamos en localStorage
   renderHabits();
 }
 
-// Renderizado inicial al cargar la página
+// Renderizado inicial al abrir la página
 renderHabits();
