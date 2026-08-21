@@ -101,3 +101,88 @@ body {
   flex-direction: column;
   gap: 0.75rem;
 }
+/* Tarjeta individual de hábito */
+.habit-card {
+  background-color: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.habit-card:hover {
+  border-color: #475569;
+  transform: translateY(-1px);
+}
+
+/* Información del hábito (texto y racha) */
+.habit-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.habit-title {
+  font-size: 1rem;
+  color: #f1f5f9;
+  font-weight: 500;
+}
+
+.habit-streak {
+  font-size: 0.8rem;
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+/* Contenedor de acciones (botones) */
+.habit-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Botón de completar */
+.btn-complete {
+  background-color: #065f46;
+  color: #34d399;
+  border: 1px solid #059669;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.btn-complete:hover {
+  background-color: #047857;
+}
+
+/* Botón de eliminar */
+.btn-delete {
+  background-color: #7f1d1d;
+  color: #f87171;
+  border: 1px solid #991b1b;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background-color 0.2s;
+}
+
+.btn-delete:hover {
+  background-color: #991b1b;
+}
+
+/* Estado completado */
+.habit-card.completed {
+  opacity: 0.6;
+  border-color: #059669;
+}
+
+.habit-card.completed .habit-title {
+  text-decoration: line-through;
+  color: #94a3b8;
+}
