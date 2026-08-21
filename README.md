@@ -1,4 +1,4 @@
-# HabitFlow 🎯
+# HabiTracker
 
 Una aplicación web interactiva para el seguimiento de hábitos diarios, cálculo de rachas y visualización de progreso.
 
