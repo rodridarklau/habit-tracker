@@ -1,52 +1,102 @@
-// 1. Selección de elementos del DOM
+// 1. Constantes y elementos del DOM
+const STORAGE_KEY = 'habitflow_habits_v2';
 const habitForm = document.getElementById('habit-form');
 const habitInput = document.getElementById('habit-input');
+const habitCategory = document.getElementById('habit-category');
 const habitsList = document.getElementById('habits-list');
 
-// Elementos de la sección de progreso
 const progressBarFill = document.getElementById('progress-bar-fill');
 const progressPercentage = document.getElementById('progress-percentage');
 const progressText = document.getElementById('progress-text');
+const activeStreakCount = document.getElementById('active-streak-count');
+const currentDateText = document.getElementById('current-date-text');
+const filterBtns = document.querySelectorAll('.filter-btn');
 
-// 2. Clave de almacenamiento local
-const STORAGE_KEY = 'habitflow_habits';
+let currentFilter = 'all';
 
-// 3. Estado inicial desde localStorage
-let habits = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+// 2. Formateador de fechas y comprobación diaria
+function getTodayString() {
+  return new Date().toISOString().split('T')[0]; // Formato: YYYY-MM-DD
+}
 
-// 4. Guardar en localStorage
-function saveHabitsToStorage() {
+function getYesterdayString() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return d.toISOString().split('T')[0];
+}
+
+function displayFormattedDate() {
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  const today = new Date().toLocaleDateString('es-ES', options);
+  currentDateText.textContent = today.charAt(0).toUpperCase() + today.slice(1);
+}
+
+// 3. Inicializar hábitos con lógica de rachas basada en fechas
+let habits = (JSON.parse(localStorage.getItem(STORAGE_KEY)) || []).map((h) => {
+  const today = getTodayString();
+  const yesterday = getYesterdayString();
+
+  // Si la última fecha de completado fue anterior a ayer, la racha se reinicia
+  if (h.lastCompletedDate && h.lastCompletedDate !== today && h.lastCompletedDate !== yesterday) {
+    h.streak = 0;
+  }
+
+  // Si no se completó hoy, el estado 'completed' vuelve a false para el nuevo día
+  if (h.lastCompletedDate !== today) {
+    h.completed = false;
+  }
+
+  return h;
+});
+
+function saveHabits() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(habits));
 }
 
-// 5. Actualizar el panel de progreso y la barra visual
-function updateProgress() {
+// 4. Panel de métricas
+function updateStats() {
   const total = habits.length;
-  const completedCount = habits.filter((h) => h.completed).length;
-  
-  const percentage = total === 0 ? 0 : Math.round((completedCount / total) * 100);
+  const completedToday = habits.filter((h) => h.completed).length;
+  const percentage = total === 0 ? 0 : Math.round((completedToday / total) * 100);
 
-  // Modificamos el DOM con los cálculos
   progressBarFill.style.width = `${percentage}%`;
   progressPercentage.textContent = `${percentage}%`;
-  progressText.textContent = `${completedCount} de ${total} hábitos completados`;
+  progressText.textContent = `${completedToday} de ${total} completados`;
+
+  const highestStreak = habits.reduce((max, h) => Math.max(max, h.streak), 0);
+  activeStreakCount.textContent = `🔥 Mayor racha: ${highestStreak} días`;
 }
 
-// 6. Renderizar los hábitos en pantalla
+// 5. Renderizado con filtrado
 function renderHabits() {
   habitsList.innerHTML = '';
 
-  if (habits.length === 0) {
-    habitsList.innerHTML = '<p style="color: #64748b; text-align: center;">No tienes hábitos registrados aún. ¡Agrega uno arriba!</p>';
+  let filteredHabits = habits;
+  if (currentFilter === 'pending') {
+    filteredHabits = habits.filter((h) => !h.completed);
+  } else if (currentFilter === 'completed') {
+    filteredHabits = habits.filter((h) => h.completed);
+  }
+
+  if (filteredHabits.length === 0) {
+    habitsList.innerHTML = `
+      <li style="text-align: center; color: #64748b; padding: 2rem 0; font-size: 0.95rem;">
+        No hay hábitos en este filtro.
+      </li>
+    `;
   } else {
-    habits.forEach((habit) => {
+    filteredHabits.forEach((habit) => {
+      const badgeClass = `badge-${habit.category.toLowerCase().replace('/', '')}`;
       const li = document.createElement('li');
       li.className = `habit-card ${habit.completed ? 'completed' : ''}`;
 
       li.innerHTML = `
         <div class="habit-info">
-          <span class="habit-title">${habit.name}</span>
-          <span class="habit-streak">🔥 Racha: ${habit.streak} días</span>
+          <div class="habit-main">
+            <span class="habit-title">${habit.name}</span>
+            <span class="badge ${badgeClass}">${habit.category}</span>
+          </div>
+          <span class="habit-streak">🔥 Racha actual: ${habit.streak} días</span>
         </div>
         <div class="habit-actions">
           <button class="btn-complete" onclick="toggleHabit(${habit.id})">
@@ -60,55 +110,68 @@ function renderHabits() {
     });
   }
 
-  // Cada vez que se renderizan hábitos, recalculamos el progreso
-  updateProgress();
+  updateStats();
 }
 
-// 7. Evento para crear un nuevo hábito
-habitForm.addEventListener('submit', (event) => {
-  event.preventDefault();
+// 6. Acciones
+habitForm.addEventListener('submit', (e) => {
+  e.preventDefault();
 
-  const habitName = habitInput.value.trim();
-  if (habitName === '') return;
+  const name = habitInput.value.trim();
+  const category = habitCategory.value;
+  if (!name) return;
 
   const newHabit = {
     id: Date.now(),
-    name: habitName,
+    name: name,
+    category: category,
     completed: false,
-    streak: 0
+    streak: 0,
+    lastCompletedDate: null
   };
 
   habits.push(newHabit);
-  saveHabitsToStorage();
+  saveHabits();
   habitInput.value = '';
-
   renderHabits();
 });
 
-// 8. Alternar completado
 function toggleHabit(id) {
-  habits = habits.map((habit) => {
-    if (habit.id === id) {
-      const isNowCompleted = !habit.completed;
+  const today = getTodayString();
+
+  habits = habits.map((h) => {
+    if (h.id === id) {
+      const isCompleting = !h.completed;
       return {
-        ...habit,
-        completed: isNowCompleted,
-        streak: isNowCompleted ? habit.streak + 1 : Math.max(0, habit.streak - 1)
+        ...h,
+        completed: isCompleting,
+        streak: isCompleting ? h.streak + 1 : Math.max(0, h.streak - 1),
+        lastCompletedDate: isCompleting ? today : null
       };
     }
-    return habit;
+    return h;
   });
 
-  saveHabitsToStorage();
+  saveHabits();
   renderHabits();
 }
 
-// 9. Eliminar hábito
 function deleteHabit(id) {
-  habits = habits.filter((habit) => habit.id !== id);
-  saveHabitsToStorage();
+  habits = habits.filter((h) => h.id !== id);
+  saveHabits();
   renderHabits();
 }
 
-// Inicialización
+// 7. Configuración de botones de filtro
+filterBtns.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    renderHabits();
+  });
+});
+
+// Inicializar la aplicación
+displayFormattedDate();
 renderHabits();
