@@ -20,13 +20,13 @@
       <div class="hero-content">
         <div class="hero-top-row">
           <div class="user-chip" id="profile-trigger">
-            <img id="user-avatar-img" src="https://api.dicebear.com/7.x/bottts/svg?seed=Ares" alt="Athlete Avatar">
+            <div class="chip-avatar-wrapper" id="chip-avatar-container"></div>
             <div>
               <span class="athlete-name" id="user-name">ATLETA #01</span>
               <span class="athlete-rank" id="user-level">NIVEL 1 • RECLUTA</span>
             </div>
           </div>
-          <button class="btn-settings" id="edit-profile-btn" title="Configurar Perfil">⚙</button>
+          <button class="btn-settings" id="edit-profile-btn" title="Personalizar Atleta">⚡ CUSTOM</button>
         </div>
 
         <div class="hero-main-title">
@@ -40,7 +40,7 @@
     </header>
 
     <main class="main-body">
-      <!-- Sistema de Rango y Medalla de Atleta -->
+      <!-- Rango Actual -->
       <section class="rank-card">
         <div class="rank-badge-icon" id="rank-icon">🛡️</div>
         <div class="rank-info">
@@ -51,22 +51,20 @@
           <div class="rank-progress-bar">
             <div class="rank-progress-fill" id="rank-bar-fill"></div>
           </div>
-          <span class="rank-next-text" id="next-rank-info">Faltan 3 días para ATLETA DEDICADO</span>
+          <span class="rank-next-text" id="next-rank-info">Calculando siguiente rango...</span>
         </div>
       </section>
 
-      <!-- Tracker Semanal (Últimos 7 Días) -->
+      <!-- Tracker Semanal (7 días) -->
       <section class="weekly-history-card">
         <div class="section-title-row">
           <span class="card-tag">HISTORIAL DE LOS ÚLTIMOS 7 DÍAS</span>
           <span class="weekly-status-label" id="weekly-completion-rate">0% Consistencia</span>
         </div>
-        <div class="days-strip" id="days-strip">
-          <!-- Se generan dinámicamente los 7 días -->
-        </div>
+        <div class="days-strip" id="days-strip"></div>
       </section>
 
-      <!-- Grid de Métricas de Rendimiento -->
+      <!-- Métricas Diarias -->
       <section class="stats-grid">
         <div class="stat-card">
           <span class="stat-label">HOY</span>
@@ -97,7 +95,7 @@
         </div>
       </section>
 
-      <!-- Formulario de Registro -->
+      <!-- Formulario de Hábitos -->
       <section class="action-card">
         <div class="card-tag">CREAR OBJETIVO DIARIO</div>
         <form id="habit-form">
@@ -122,7 +120,7 @@
         </form>
       </section>
 
-      <!-- Control de Filtros -->
+      <!-- Filtros -->
       <div class="filter-strip">
         <span class="filter-title">REGISTRO DE HÁBITOS</span>
         <div class="filter-buttons">
@@ -137,27 +135,107 @@
     </main>
   </div>
 
-  <!-- Modal Perfil Atleta -->
+  <!-- MODAL DE PERSONALIZACIÓN COMPLETA DE AVATAR NATIVO -->
   <div class="modal-overlay" id="profile-modal">
-    <div class="modal-box">
+    <div class="modal-box avatar-studio-box">
       <div class="modal-header">
-        <h3>PERFIL DE ATLETA</h3>
+        <div>
+          <h3>ATLETA STUDIO CUSTOMIZER</h3>
+          <p class="modal-sub">Diseña tu identidad visual nativa</p>
+        </div>
         <button class="close-btn" id="close-modal-btn">✕</button>
       </div>
-      <div class="avatar-select-area">
-        <label>ELIGE TU AVATAR:</label>
-        <div class="avatars-row">
-          <img class="avatar-pick selected" data-seed="Ares" src="https://api.dicebear.com/7.x/bottts/svg?seed=Ares" alt="Ares">
-          <img class="avatar-pick" data-seed="Titan" src="https://api.dicebear.com/7.x/bottts/svg?seed=Titan" alt="Titan">
-          <img class="avatar-pick" data-seed="Volt" src="https://api.dicebear.com/7.x/bottts/svg?seed=Volt" alt="Volt">
-          <img class="avatar-pick" data-seed="Rogue" src="https://api.dicebear.com/7.x/bottts/svg?seed=Rogue" alt="Rogue">
+
+      <!-- Preview Dinámico SVG -->
+      <div class="avatar-live-preview">
+        <div class="preview-avatar-glow"></div>
+        <div class="svg-avatar-display" id="svg-preview-container"></div>
+        <button type="button" class="btn-randomize" id="randomize-avatar-btn">🎲 Generar Aleatorio</button>
+      </div>
+
+      <!-- Formulario de Configuración de Avatar -->
+      <div class="customizer-scroll-area">
+        <div class="field-group">
+          <label>NOMBRE / NICKNAME:</label>
+          <input type="text" id="profile-name-input" placeholder="Tu nombre de atleta">
+        </div>
+
+        <div class="customizer-grid">
+          <!-- Corte de Pelo -->
+          <div class="field-group">
+            <label>CORTE / ESTILO:</label>
+            <select id="avatar-hair">
+              <option value="fade">Textured Fade / Crop</option>
+              <option value="buzz">Buzz Cut (Rapado)</option>
+              <option value="dreads">Modern Dreads</option>
+              <option value="topknot">Top Knot / Moño</option>
+              <option value="undercut">Undercut Despeinado</option>
+              <option value="bald">Calvo / Headshave</option>
+            </select>
+          </div>
+
+          <!-- Color de Pelo -->
+          <div class="field-group">
+            <label>COLOR DE PELO:</label>
+            <select id="avatar-hair-color">
+              <option value="#1c1917">Negro Carbón</option>
+              <option value="#451a03">Castaño Oscuro</option>
+              <option value="#b45309">Cobrizo / Auburn</option>
+              <option value="#eab308">Rubio Platino</option>
+              <option value="#ccff00">Lima Neón (Cyber)</option>
+              <option value="#38bdf8">Azul Eléctrico</option>
+            </select>
+          </div>
+
+          <!-- Tono de Piel -->
+          <div class="field-group">
+            <label>TONO DE PIEL:</label>
+            <select id="avatar-skin-color">
+              <option value="#f8d2b7">Claro Natural</option>
+              <option value="#e0a37e">Bronceado Atlético</option>
+              <option value="#c68642">Trigueño / Canela</option>
+              <option value="#8d5524">Moreno Cálido</option>
+              <option value="#492816">Ébano Intenso</option>
+            </select>
+          </div>
+
+          <!-- Barba / Vello Facial -->
+          <div class="field-group">
+            <label>BARBA / FACIAL:</label>
+            <select id="avatar-facial-hair">
+              <option value="none">Afeitado Limpio</option>
+              <option value="stubble">Barba Corta (Stubble)</option>
+              <option value="full">Barba Completa Definida</option>
+              <option value="goatee">Candado / Goatee</option>
+            </select>
+          </div>
+
+          <!-- Accesorios -->
+          <div class="field-group">
+            <label>ACCESORIOS:</label>
+            <select id="avatar-accessories">
+              <option value="none">Ninguno</option>
+              <option value="shades">Gafas Deportivas Shield</option>
+              <option value="headband">Bandana de Entrenamiento</option>
+              <option value="mask">Mascarilla Techwear</option>
+            </select>
+          </div>
+
+          <!-- Expresión -->
+          <div class="field-group">
+            <label>EXPRESIÓN / ROSTRO:</label>
+            <select id="avatar-face">
+              <option value="serious">Enfocado / Serio</option>
+              <option value="confident">Sonrisa Confiada</option>
+              <option value="beast">Modo Bestia (Furia)</option>
+            </select>
+          </div>
         </div>
       </div>
-      <div class="field-group">
-        <label for="profile-name-input">NOMBRE / ATLETA ID:</label>
-        <input type="text" id="profile-name-input" placeholder="Tu nombre">
+
+      <div class="modal-actions-fixed">
+        <button class="btn-volt" id="save-profile-btn">GUARDAR Y APLICAR ATLETA</button>
       </div>
-      <button class="btn-volt" id="save-profile-btn">GUARDAR CAMBIOS</button>
     </div>
   </div>
 
