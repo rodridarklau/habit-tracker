@@ -1,6 +1,7 @@
 // Storage Keys
 const HABITS_KEY = 'habitflow_elite_habits';
 const PROFILE_KEY = 'habitflow_elite_profile';
+const HISTORY_KEY = 'habitflow_elite_history'; // Almacena historial de días completados
 
 // DOM Elements
 const habitForm = document.getElementById('habit-form');
@@ -16,7 +17,15 @@ const xpText = document.getElementById('xp-text');
 const currentDateText = document.getElementById('current-date-text');
 const filterBtns = document.querySelectorAll('.f-btn');
 
-// Athlete Profile Elements
+// Rank & History Elements
+const rankIcon = document.getElementById('rank-icon');
+const currentRankTitle = document.getElementById('current-rank-title');
+const rankBarFill = document.getElementById('rank-bar-fill');
+const nextRankInfo = document.getElementById('next-rank-info');
+const daysStrip = document.getElementById('days-strip');
+const weeklyCompletionRate = document.getElementById('weekly-completion-rate');
+
+// Profile Elements
 const userNameEl = document.getElementById('user-name');
 const userAvatarImg = document.getElementById('user-avatar-img');
 const userLevelEl = document.getElementById('user-level');
@@ -38,6 +47,9 @@ let userProfile = JSON.parse(localStorage.getItem(PROFILE_KEY)) || {
   level: 1
 };
 
+// Historial de días exitosos: arreglo de fechas completadas ['2026-08-20', '2026-08-21']
+let completionHistory = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+
 // Date Utilities
 function getTodayString() {
   return new Date().toISOString().split('T')[0];
@@ -55,7 +67,7 @@ function displayDate() {
   currentDateText.textContent = `HOY • ${today.toUpperCase()}`;
 }
 
-// Habits Load & Streak Verification
+// Habits Load
 let habits = (JSON.parse(localStorage.getItem(HABITS_KEY)) || []).map((h) => {
   const today = getTodayString();
   const yesterday = getYesterdayString();
@@ -72,24 +84,98 @@ let habits = (JSON.parse(localStorage.getItem(HABITS_KEY)) || []).map((h) => {
 function saveAll() {
   localStorage.setItem(HABITS_KEY, JSON.stringify(habits));
   localStorage.setItem(PROFILE_KEY, JSON.stringify(userProfile));
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(completionHistory));
 }
 
-// Update Athlete Stats
+// Rangos de Disciplina basados en Racha
+const RANKS = [
+  { name: 'RECLUTA', minDays: 0, maxDays: 2, icon: '🛡️', next: 'ATLETA DEDICADO' },
+  { name: 'ATLETA DEDICADO', minDays: 3, maxDays: 6, icon: '⚡', next: 'ÉLITE DISCIPLINADO' },
+  { name: 'ÉLITE DISCIPLINADO', minDays: 7, maxDays: 13, icon: '🏆', next: 'MÁQUINA IMPARABLE' },
+  { name: 'MÁQUINA IMPARABLE', minDays: 14, maxDays: 29, icon: '🔥', next: 'TITÁN LEGENDARIO' },
+  { name: 'TITÁN LEGENDARIO', minDays: 30, maxDays: 999, icon: '👑', next: 'MÁXIMO RANGO ALCANZADO' }
+];
+
+function updateRankUI(maxStreak) {
+  const currentRank = RANKS.find((r) => maxStreak >= r.minDays && maxStreak <= r.maxDays) || RANKS[0];
+  
+  rankIcon.textContent = currentRank.icon;
+  currentRankTitle.textContent = currentRank.name;
+  
+  if (currentRank.maxDays === 999) {
+    rankBarFill.style.width = '100%';
+    nextRankInfo.textContent = '¡Has alcanzado la cúspide de la disciplina!';
+  } else {
+    const daysIntoRank = maxStreak - currentRank.minDays;
+    const rankSpan = (currentRank.maxDays - currentRank.minDays) + 1;
+    const progressPercent = Math.min(100, Math.round((daysIntoRank / rankSpan) * 100));
+    const daysLeft = (currentRank.maxDays + 1) - maxStreak;
+    
+    rankBarFill.style.width = `${progressPercent}%`;
+    nextRankInfo.textContent = `Faltan ${daysLeft} día(s) para ${currentRank.next}`;
+  }
+}
+
+// Tracker de los últimos 7 días
+function renderWeeklyHistory() {
+  daysStrip.innerHTML = '';
+  const daysOfWeek = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
+  let completedDaysCount = 0;
+
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    const dateStr = date.toISOString().split('T')[0];
+    const isToday = i === 0;
+    
+    // Verificamos si este día fue completado
+    const isCompleted = completionHistory.includes(dateStr);
+    if (isCompleted) completedDaysCount++;
+
+    const dayBox = document.createElement('div');
+    dayBox.className = `day-box ${isToday ? 'today' : ''} ${isCompleted ? 'completed' : ''}`;
+
+    dayBox.innerHTML = `
+      <span class="day-name">${daysOfWeek[date.getDay()]}</span>
+      <span class="day-num">${date.getDate()}</span>
+      <div class="day-indicator">${isCompleted ? '✓' : '•'}</div>
+    `;
+
+    daysStrip.appendChild(dayBox);
+  }
+
+  const weeklyPercent = Math.round((completedDaysCount / 7) * 100);
+  weeklyCompletionRate.textContent = `${weeklyPercent}% Consistencia Semanal`;
+}
+
+// Verificar si hoy se cumplieron TODOS los hábitos para marcar el día en el historial
+function checkDayCompletionStatus() {
+  const today = getTodayString();
+  const total = habits.length;
+  const completedCount = habits.filter((h) => h.completed).length;
+
+  if (total > 0 && completedCount === total) {
+    if (!completionHistory.includes(today)) {
+      completionHistory.push(today);
+    }
+  } else {
+    // Si desmarca algún hábito y ya no están todos completos hoy, se retira del historial
+    completionHistory = completionHistory.filter((d) => d !== today);
+  }
+
+  saveAll();
+  renderWeeklyHistory();
+}
+
+// Update Profile
 function updateProfileUI() {
   userNameEl.textContent = userProfile.name.toUpperCase();
   userAvatarImg.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${userProfile.avatarSeed}`;
-  userLevelEl.textContent = `NIVEL ${userProfile.level} • ${getRankTitle(userProfile.level)}`;
+  userLevelEl.textContent = `NIVEL ${userProfile.level} • ${currentRankTitle.textContent}`;
 
   xpDisplay.textContent = userProfile.xp;
   const currentLevelXp = userProfile.xp % 100;
-  xpText.textContent = `${currentLevelXp}/100 XP para Lv. ${userProfile.level + 1}`;
-}
-
-function getRankTitle(lvl) {
-  if (lvl >= 10) return 'TITÁN';
-  if (lvl >= 5) return 'VETERANO';
-  if (lvl >= 3) return 'ELITE';
-  return 'RECLUTA';
+  xpText.textContent = `${currentLevelXp}/100 XP`;
 }
 
 function addXP(amount) {
@@ -109,6 +195,10 @@ function updateStats() {
 
   const maxStreak = habits.reduce((acc, h) => Math.max(acc, h.streak), 0);
   streakStat.textContent = maxStreak;
+
+  updateRankUI(maxStreak);
+  checkDayCompletionStatus();
+  updateProfileUI();
 }
 
 // Render Habits
@@ -152,7 +242,7 @@ function renderHabits() {
   updateStats();
 }
 
-// Habit Actions
+// Acciones
 habitForm.addEventListener('submit', (e) => {
   e.preventDefault();
   const name = habitInput.value.trim();
@@ -179,9 +269,7 @@ function toggleHabit(id) {
   habits = habits.map((h) => {
     if (h.id === id) {
       const isCompleting = !h.completed;
-      if (isCompleting) {
-        addXP(25);
-      }
+      if (isCompleting) addXP(25);
       return {
         ...h,
         completed: isCompleting,
@@ -202,7 +290,7 @@ function deleteHabit(id) {
   renderHabits();
 }
 
-// Filters
+// Filtros
 filterBtns.forEach((btn) => {
   btn.addEventListener('click', () => {
     filterBtns.forEach((b) => b.classList.remove('active'));
@@ -212,7 +300,7 @@ filterBtns.forEach((btn) => {
   });
 });
 
-// Profile Modal Actions
+// Modal Perfil
 editProfileBtn.addEventListener('click', () => {
   profileNameInput.value = userProfile.name;
   selectedAvatarSeed = userProfile.avatarSeed;
@@ -222,9 +310,7 @@ editProfileBtn.addEventListener('click', () => {
   profileModal.classList.add('open');
 });
 
-closeModalBtn.addEventListener('click', () => {
-  profileModal.classList.remove('open');
-});
+closeModalBtn.addEventListener('click', () => profileModal.classList.remove('open'));
 
 avatarOptions.forEach((img) => {
   img.addEventListener('click', () => {
@@ -245,5 +331,5 @@ saveProfileBtn.addEventListener('click', () => {
 
 // Init
 displayDate();
-updateProfileUI();
+renderWeeklyHistory();
 renderHabits();
