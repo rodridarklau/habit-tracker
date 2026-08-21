@@ -3,51 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HabitFlow - Tracker de Hábitos</title>
+  <title>HabitFlow - Tracker Profesional de Hábitos</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <div class="container">
-    <!-- Encabezado principal -->
     <header class="app-header">
-      <h1>HabitFlow 🎯</h1>
-      <p>Construye consistencia día a día</p>
+      <div class="header-tag">Productividad & Enfoque</div>
+      <h1>HabitTracaker</h1>
+      <p id="current-date-text">Cargando fecha...</p>
     </header>
 
     <main class="main-content">
-      <!-- Sección del formulario para agregar hábitos -->
-      <section class="habit-form-section">
+      <!-- Formulario para agregar hábitos con categorías -->
+      <section class="card habit-form-section">
         <h2>Nuevo Hábito</h2>
         <form id="habit-form">
-          <input 
-            type="text" 
-            id="habit-input" 
-            placeholder="Ej. Leer 20 minutos, Entrenar..." 
-            autocomplete="off"
-            required
-          >
-          <button type="submit" id="add-btn">Agregar</button>
+          <div class="input-row">
+            <input 
+              type="text" 
+              id="habit-input" 
+              placeholder="Ej. Leer 20 páginas, Estudiar algoritmos..." 
+              autocomplete="off"
+              required
+            >
+            <select id="habit-category" required>
+              <option value="Estudio">📚 Estudio</option>
+              <option value="Salud">💪 Salud / Fitness</option>
+              <option value="Productividad">⚡ Productividad</option>
+              <option value="Bienestar">🧘 Bienestar</option>
+            </select>
+          </div>
+          <button type="submit" id="add-btn">Crear Hábito</button>
         </form>
       </section>
 
-      <!-- Panel de Estadísticas y Progreso Diario -->
-      <section class="progress-section">
+      <!-- Panel de Estadísticas -->
+      <section class="card progress-section">
         <div class="progress-header">
-          <h2>Progreso de Hoy</h2>
+          <h2>Rendimiento Diario</h2>
           <span id="progress-percentage">0%</span>
         </div>
         <div class="progress-bar-container">
           <div id="progress-bar-fill" class="progress-bar-fill"></div>
         </div>
-        <p id="progress-text" class="progress-text">0 de 0 hábitos completados</p>
+        <div class="stats-footer">
+          <span id="progress-text">0 de 0 completados</span>
+          <span id="active-streak-count">🔥 Racha activa: 0 días</span>
+        </div>
+      </section>
+
+      <!-- Barra de Filtros -->
+      <section class="filters-container">
+        <button class="filter-btn active" data-filter="all">Todos</button>
+        <button class="filter-btn" data-filter="pending">Pendientes</button>
+        <button class="filter-btn" data-filter="completed">Completados</button>
       </section>
 
       <!-- Lista de Hábitos -->
       <section class="habits-list-section">
-        <h2>Tus Hábitos</h2>
-        <ul id="habits-list" class="habits-list">
-          <!-- Elementos generados dinámicamente con JavaScript -->
-        </ul>
+        <ul id="habits-list" class="habits-list"></ul>
       </section>
     </main>
   </div>
