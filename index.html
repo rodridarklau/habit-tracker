@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HabitFlow Elite - Performance & Habit Tracker</title>
-  <!-- Fuentes profesionales deportivas/técnicas -->
+  <title>HabitTracker - Performance & Habit Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -21,7 +20,7 @@
       <div class="hero-content">
         <div class="hero-top-row">
           <div class="user-chip" id="profile-trigger">
-            <img id="user-avatar-img" src="https://api.dicebear.com/7.x/bottts/svg?seed=Felix" alt="Athlete Avatar">
+            <img id="user-avatar-img" src="https://api.dicebear.com/7.x/bottts/svg?seed=Ares" alt="Athlete Avatar">
             <div>
               <span class="athlete-name" id="user-name">ATLETA #01</span>
               <span class="athlete-rank" id="user-level">NIVEL 1 • RECLUTA</span>
@@ -41,10 +40,36 @@
     </header>
 
     <main class="main-body">
-      <!-- Grid de Métricas de Rendimiento (Estilo Whoop / Strava) -->
+      <!-- Sistema de Rango y Medalla de Atleta -->
+      <section class="rank-card">
+        <div class="rank-badge-icon" id="rank-icon">🛡️</div>
+        <div class="rank-info">
+          <div class="rank-header">
+            <span class="rank-label">RANGO ACTUAL</span>
+            <span class="rank-name" id="current-rank-title">RECLUTA</span>
+          </div>
+          <div class="rank-progress-bar">
+            <div class="rank-progress-fill" id="rank-bar-fill"></div>
+          </div>
+          <span class="rank-next-text" id="next-rank-info">Faltan 3 días para ATLETA DEDICADO</span>
+        </div>
+      </section>
+
+      <!-- Tracker Semanal (Últimos 7 Días) -->
+      <section class="weekly-history-card">
+        <div class="section-title-row">
+          <span class="card-tag">HISTORIAL DE LOS ÚLTIMOS 7 DÍAS</span>
+          <span class="weekly-status-label" id="weekly-completion-rate">0% Consistencia</span>
+        </div>
+        <div class="days-strip" id="days-strip">
+          <!-- Se generan dinámicamente los 7 días -->
+        </div>
+      </section>
+
+      <!-- Grid de Métricas de Rendimiento -->
       <section class="stats-grid">
         <div class="stat-card">
-          <span class="stat-label">CUMPLIMIENTO</span>
+          <span class="stat-label">HOY</span>
           <div class="stat-value-row">
             <span class="stat-number" id="progress-percentage">0%</span>
           </div>
@@ -54,12 +79,12 @@
         </div>
 
         <div class="stat-card highlight">
-          <span class="stat-label">RACHA RÉCORD</span>
+          <span class="stat-label">RACHA ACTUAL</span>
           <div class="stat-value-row">
             <span class="stat-number neon-text" id="streak-stat">0</span>
             <span class="stat-unit">DÍAS</span>
           </div>
-          <span class="stat-sub">🔥 Máxima consistencia</span>
+          <span class="stat-sub">🔥 Fuego activo</span>
         </div>
 
         <div class="stat-card">
@@ -68,11 +93,11 @@
             <span class="stat-number" id="xp-display">0</span>
             <span class="stat-unit">XP</span>
           </div>
-          <span class="stat-sub" id="xp-text">0 / 100 para Lv. Up</span>
+          <span class="stat-sub" id="xp-text">0 / 100 XP</span>
         </div>
       </section>
 
-      <!-- Formulario de Registro Rápido -->
+      <!-- Formulario de Registro -->
       <section class="action-card">
         <div class="card-tag">CREAR OBJETIVO DIARIO</div>
         <form id="habit-form">

@@ -4,7 +4,7 @@
   --surface-2: #181818;
   --border-subtle: #242424;
   --border-active: #333333;
-  --neon-volt: #ccff00; /* Verde Lima Atlético */
+  --neon-volt: #ccff00;
   --neon-volt-glow: rgba(204, 255, 0, 0.25);
   --text-pure: #ffffff;
   --text-dim: #8e8e93;
@@ -37,10 +37,10 @@ body {
   min-height: 100vh;
 }
 
-/* HERO BANNER ATHLETIC */
+/* HERO BANNER */
 .hero-banner {
   position: relative;
-  height: 240px;
+  height: 230px;
   overflow: hidden;
   display: flex;
   align-items: flex-end;
@@ -125,7 +125,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: border-color 0.2s;
 }
 
 .btn-settings:hover {
@@ -178,19 +177,176 @@ body {
   padding: 1.25rem;
 }
 
-/* STATS GRID ESTILO WHOOP */
+/* TARJETA DE RANGOS ATHLETIC */
+.rank-card {
+  background: linear-gradient(135deg, #182210 0%, var(--surface-1) 100%);
+  border: 1px solid rgba(204, 255, 0, 0.3);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.rank-badge-icon {
+  font-size: 2rem;
+  background: #080808;
+  border: 1px solid var(--border-active);
+  width: 55px;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+
+.rank-info {
+  flex: 1;
+}
+
+.rank-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.4rem;
+}
+
+.rank-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+}
+
+.rank-name {
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--neon-volt);
+  letter-spacing: 0.04em;
+}
+
+.rank-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #080808;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 0.35rem;
+}
+
+.rank-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--neon-volt);
+  transition: width 0.4s ease;
+}
+
+.rank-next-text {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+/* HISTORIAL SEMANAL DE 7 DÍAS */
+.weekly-history-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.section-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.85rem;
+}
+
+.card-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--neon-volt);
+}
+
+.weekly-status-label {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  font-weight: 700;
+}
+
+.days-strip {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+.day-box {
+  background: var(--bg-black);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.5rem 0.2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.day-box.today {
+  border-color: var(--neon-volt);
+}
+
+.day-box.completed {
+  background: rgba(204, 255, 0, 0.1);
+  border-color: var(--neon-volt);
+}
+
+.day-box.completed .day-indicator {
+  background: var(--neon-volt);
+  color: #000;
+}
+
+.day-name {
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: var(--text-dim);
+}
+
+.day-num {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-pure);
+}
+
+.day-indicator {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #222;
+  font-size: 0.55rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+/* STATS GRID */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.75rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
 }
 
 .stat-card {
   background: var(--surface-1);
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
-  padding: 1rem 0.85rem;
+  padding: 0.9rem 0.85rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -212,32 +368,20 @@ body {
   display: flex;
   align-items: baseline;
   gap: 0.25rem;
-  margin: 0.35rem 0;
+  margin: 0.25rem 0;
 }
 
 .stat-number {
   font-family: 'Cabinet Grotesk', 'Inter', sans-serif;
-  font-size: 1.8rem;
+  font-size: 1.7rem;
   font-weight: 900;
   color: var(--text-pure);
   line-height: 1;
 }
 
-.neon-text {
-  color: var(--neon-volt);
-}
-
-.stat-unit {
-  font-size: 0.65rem;
-  font-weight: 800;
-  color: var(--text-dim);
-}
-
-.stat-sub {
-  font-size: 0.65rem;
-  color: var(--text-dim);
-  font-weight: 600;
-}
+.neon-text { color: var(--neon-volt); }
+.stat-unit { font-size: 0.65rem; font-weight: 800; color: var(--text-dim); }
+.stat-sub { font-size: 0.65rem; color: var(--text-dim); font-weight: 600; }
 
 .mini-progress-track {
   width: 100%;
@@ -255,21 +399,13 @@ body {
   transition: width 0.4s ease;
 }
 
-/* FORMULARIO DE ACCIÓN */
+/* FORMULARIO */
 .action-card {
   background: var(--surface-1);
   border: 1px solid var(--border-subtle);
   border-radius: 14px;
   padding: 1.25rem;
-  margin-bottom: 1.5rem;
-}
-
-.card-tag {
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: var(--neon-volt);
-  margin-bottom: 0.85rem;
+  margin-bottom: 1.25rem;
 }
 
 .input-stack {
@@ -286,7 +422,6 @@ body {
   border-radius: 8px;
   color: var(--text-pure);
   font-size: 0.85rem;
-  font-weight: 500;
   outline: none;
 }
 
@@ -312,7 +447,6 @@ body {
   padding: 0.85rem;
   background: var(--neon-volt);
   color: #000000;
-  font-family: 'Inter', sans-serif;
   font-size: 0.8rem;
   font-weight: 900;
   letter-spacing: 0.05em;
@@ -335,11 +469,11 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.85rem;
 }
 
 .filter-title {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   color: var(--text-muted);
@@ -356,7 +490,6 @@ body {
   color: var(--text-dim);
   font-size: 0.65rem;
   font-weight: 800;
-  letter-spacing: 0.05em;
   padding: 0.35rem 0.75rem;
   border-radius: 6px;
   cursor: pointer;
@@ -369,7 +502,7 @@ body {
   border-color: var(--text-pure);
 }
 
-/* LISTA DE HÁBITOS */
+/* LISTA */
 .habits-stack {
   list-style: none;
   display: flex;
@@ -385,11 +518,6 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: border-color 0.2s;
-}
-
-.habit-card:hover {
-  border-color: var(--border-active);
 }
 
 .habit-info {
@@ -407,13 +535,11 @@ body {
 .habit-title {
   font-size: 0.95rem;
   font-weight: 700;
-  letter-spacing: -0.01em;
 }
 
 .discipline-badge {
   font-size: 0.6rem;
   font-weight: 800;
-  letter-spacing: 0.05em;
   padding: 0.2rem 0.45rem;
   border-radius: 4px;
   background: var(--surface-2);
@@ -441,7 +567,6 @@ body {
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 800;
-  letter-spacing: 0.04em;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -458,7 +583,6 @@ body {
   font-size: 1.1rem;
   cursor: pointer;
   padding: 0.3rem 0.5rem;
-  transition: color 0.2s;
 }
 
 .btn-del:hover {
@@ -517,7 +641,6 @@ body {
 .modal-header h3 {
   font-size: 0.9rem;
   font-weight: 900;
-  letter-spacing: 0.05em;
 }
 
 .close-btn {
@@ -532,7 +655,6 @@ body {
   display: block;
   font-size: 0.65rem;
   font-weight: 800;
-  letter-spacing: 0.08em;
   color: var(--text-dim);
   margin-bottom: 0.5rem;
 }
