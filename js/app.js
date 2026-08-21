@@ -1,5 +1,8 @@
-// 1. Constantes y elementos del DOM
-const STORAGE_KEY = 'habitflow_habits_v2';
+// Storage Keys
+const HABITS_KEY = 'habitflow_elite_habits';
+const PROFILE_KEY = 'habitflow_elite_profile';
+
+// DOM Elements
 const habitForm = document.getElementById('habit-form');
 const habitInput = document.getElementById('habit-input');
 const habitCategory = document.getElementById('habit-category');
@@ -7,16 +10,37 @@ const habitsList = document.getElementById('habits-list');
 
 const progressBarFill = document.getElementById('progress-bar-fill');
 const progressPercentage = document.getElementById('progress-percentage');
-const progressText = document.getElementById('progress-text');
-const activeStreakCount = document.getElementById('active-streak-count');
+const streakStat = document.getElementById('streak-stat');
+const xpDisplay = document.getElementById('xp-display');
+const xpText = document.getElementById('xp-text');
 const currentDateText = document.getElementById('current-date-text');
-const filterBtns = document.querySelectorAll('.filter-btn');
+const filterBtns = document.querySelectorAll('.f-btn');
+
+// Athlete Profile Elements
+const userNameEl = document.getElementById('user-name');
+const userAvatarImg = document.getElementById('user-avatar-img');
+const userLevelEl = document.getElementById('user-level');
+const editProfileBtn = document.getElementById('edit-profile-btn');
+const profileModal = document.getElementById('profile-modal');
+const closeModalBtn = document.getElementById('close-modal-btn');
+const saveProfileBtn = document.getElementById('save-profile-btn');
+const profileNameInput = document.getElementById('profile-name-input');
+const avatarOptions = document.querySelectorAll('.avatar-pick');
 
 let currentFilter = 'all';
+let selectedAvatarSeed = 'Ares';
 
-// 2. Formateador de fechas y comprobación diaria
+// State
+let userProfile = JSON.parse(localStorage.getItem(PROFILE_KEY)) || {
+  name: 'ATLETA #01',
+  avatarSeed: 'Ares',
+  xp: 0,
+  level: 1
+};
+
+// Date Utilities
 function getTodayString() {
-  return new Date().toISOString().split('T')[0]; // Formato: YYYY-MM-DD
+  return new Date().toISOString().split('T')[0];
 }
 
 function getYesterdayString() {
@@ -25,87 +49,102 @@ function getYesterdayString() {
   return d.toISOString().split('T')[0];
 }
 
-function displayFormattedDate() {
-  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+function displayDate() {
+  const options = { weekday: 'long', day: 'numeric', month: 'short' };
   const today = new Date().toLocaleDateString('es-ES', options);
-  currentDateText.textContent = today.charAt(0).toUpperCase() + today.slice(1);
+  currentDateText.textContent = `HOY • ${today.toUpperCase()}`;
 }
 
-// 3. Inicializar hábitos con lógica de rachas basada en fechas
-let habits = (JSON.parse(localStorage.getItem(STORAGE_KEY)) || []).map((h) => {
+// Habits Load & Streak Verification
+let habits = (JSON.parse(localStorage.getItem(HABITS_KEY)) || []).map((h) => {
   const today = getTodayString();
   const yesterday = getYesterdayString();
 
-  // Si la última fecha de completado fue anterior a ayer, la racha se reinicia
   if (h.lastCompletedDate && h.lastCompletedDate !== today && h.lastCompletedDate !== yesterday) {
     h.streak = 0;
   }
-
-  // Si no se completó hoy, el estado 'completed' vuelve a false para el nuevo día
   if (h.lastCompletedDate !== today) {
     h.completed = false;
   }
-
   return h;
 });
 
-function saveHabits() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(habits));
+function saveAll() {
+  localStorage.setItem(HABITS_KEY, JSON.stringify(habits));
+  localStorage.setItem(PROFILE_KEY, JSON.stringify(userProfile));
 }
 
-// 4. Panel de métricas
+// Update Athlete Stats
+function updateProfileUI() {
+  userNameEl.textContent = userProfile.name.toUpperCase();
+  userAvatarImg.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${userProfile.avatarSeed}`;
+  userLevelEl.textContent = `NIVEL ${userProfile.level} • ${getRankTitle(userProfile.level)}`;
+
+  xpDisplay.textContent = userProfile.xp;
+  const currentLevelXp = userProfile.xp % 100;
+  xpText.textContent = `${currentLevelXp}/100 XP para Lv. ${userProfile.level + 1}`;
+}
+
+function getRankTitle(lvl) {
+  if (lvl >= 10) return 'TITÁN';
+  if (lvl >= 5) return 'VETERANO';
+  if (lvl >= 3) return 'ELITE';
+  return 'RECLUTA';
+}
+
+function addXP(amount) {
+  userProfile.xp += amount;
+  userProfile.level = Math.floor(userProfile.xp / 100) + 1;
+  saveAll();
+  updateProfileUI();
+}
+
 function updateStats() {
   const total = habits.length;
-  const completedToday = habits.filter((h) => h.completed).length;
-  const percentage = total === 0 ? 0 : Math.round((completedToday / total) * 100);
+  const completedCount = habits.filter((h) => h.completed).length;
+  const percentage = total === 0 ? 0 : Math.round((completedCount / total) * 100);
 
   progressBarFill.style.width = `${percentage}%`;
   progressPercentage.textContent = `${percentage}%`;
-  progressText.textContent = `${completedToday} de ${total} completados`;
 
-  const highestStreak = habits.reduce((max, h) => Math.max(max, h.streak), 0);
-  activeStreakCount.textContent = `🔥 Mayor racha: ${highestStreak} días`;
+  const maxStreak = habits.reduce((acc, h) => Math.max(acc, h.streak), 0);
+  streakStat.textContent = maxStreak;
 }
 
-// 5. Renderizado con filtrado
+// Render Habits
 function renderHabits() {
   habitsList.innerHTML = '';
 
-  let filteredHabits = habits;
-  if (currentFilter === 'pending') {
-    filteredHabits = habits.filter((h) => !h.completed);
-  } else if (currentFilter === 'completed') {
-    filteredHabits = habits.filter((h) => h.completed);
-  }
+  let filtered = habits;
+  if (currentFilter === 'pending') filtered = habits.filter((h) => !h.completed);
+  if (currentFilter === 'completed') filtered = habits.filter((h) => h.completed);
 
-  if (filteredHabits.length === 0) {
+  if (filtered.length === 0) {
     habitsList.innerHTML = `
-      <li style="text-align: center; color: #64748b; padding: 2rem 0; font-size: 0.95rem;">
-        No hay hábitos en este filtro.
+      <li style="text-align: center; color: var(--text-muted); padding: 2.5rem 0; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em;">
+        NO HAY OBJETIVOS EN ESTE REGISTRO
       </li>
     `;
   } else {
-    filteredHabits.forEach((habit) => {
-      const badgeClass = `badge-${habit.category.toLowerCase().replace('/', '')}`;
+    filtered.forEach((habit) => {
       const li = document.createElement('li');
       li.className = `habit-card ${habit.completed ? 'completed' : ''}`;
 
       li.innerHTML = `
         <div class="habit-info">
-          <div class="habit-main">
+          <div class="habit-head">
             <span class="habit-title">${habit.name}</span>
-            <span class="badge ${badgeClass}">${habit.category}</span>
+            <span class="discipline-badge">${habit.category}</span>
           </div>
-          <span class="habit-streak">🔥 Racha actual: ${habit.streak} días</span>
+          <span class="streak-tag">🔥 RACHA: ${habit.streak} DÍAS</span>
         </div>
         <div class="habit-actions">
-          <button class="btn-complete" onclick="toggleHabit(${habit.id})">
-            ${habit.completed ? 'Desmarcar' : 'Completar'}
+          <button class="btn-check" onclick="toggleHabit(${habit.id})">
+            ${habit.completed ? 'COMPLETADO' : 'CUMPLIR'}
           </button>
-          <button class="btn-delete" onclick="deleteHabit(${habit.id})">Eliminar</button>
+          <button class="btn-del" onclick="deleteHabit(${habit.id})" title="Eliminar">✕</button>
         </div>
       `;
-
       habitsList.appendChild(li);
     });
   }
@@ -113,25 +152,23 @@ function renderHabits() {
   updateStats();
 }
 
-// 6. Acciones
+// Habit Actions
 habitForm.addEventListener('submit', (e) => {
   e.preventDefault();
-
   const name = habitInput.value.trim();
-  const category = habitCategory.value;
   if (!name) return;
 
   const newHabit = {
     id: Date.now(),
     name: name,
-    category: category,
+    category: habitCategory.value,
     completed: false,
     streak: 0,
     lastCompletedDate: null
   };
 
   habits.push(newHabit);
-  saveHabits();
+  saveAll();
   habitInput.value = '';
   renderHabits();
 });
@@ -142,6 +179,9 @@ function toggleHabit(id) {
   habits = habits.map((h) => {
     if (h.id === id) {
       const isCompleting = !h.completed;
+      if (isCompleting) {
+        addXP(25);
+      }
       return {
         ...h,
         completed: isCompleting,
@@ -152,17 +192,17 @@ function toggleHabit(id) {
     return h;
   });
 
-  saveHabits();
+  saveAll();
   renderHabits();
 }
 
 function deleteHabit(id) {
   habits = habits.filter((h) => h.id !== id);
-  saveHabits();
+  saveAll();
   renderHabits();
 }
 
-// 7. Configuración de botones de filtro
+// Filters
 filterBtns.forEach((btn) => {
   btn.addEventListener('click', () => {
     filterBtns.forEach((b) => b.classList.remove('active'));
@@ -172,6 +212,38 @@ filterBtns.forEach((btn) => {
   });
 });
 
-// Inicializar la aplicación
-displayFormattedDate();
+// Profile Modal Actions
+editProfileBtn.addEventListener('click', () => {
+  profileNameInput.value = userProfile.name;
+  selectedAvatarSeed = userProfile.avatarSeed;
+  avatarOptions.forEach((img) => {
+    img.classList.toggle('selected', img.dataset.seed === selectedAvatarSeed);
+  });
+  profileModal.classList.add('open');
+});
+
+closeModalBtn.addEventListener('click', () => {
+  profileModal.classList.remove('open');
+});
+
+avatarOptions.forEach((img) => {
+  img.addEventListener('click', () => {
+    avatarOptions.forEach((opt) => opt.classList.remove('selected'));
+    img.classList.add('selected');
+    selectedAvatarSeed = img.dataset.seed;
+  });
+});
+
+saveProfileBtn.addEventListener('click', () => {
+  const newName = profileNameInput.value.trim();
+  if (newName) userProfile.name = newName;
+  userProfile.avatarSeed = selectedAvatarSeed;
+  saveAll();
+  updateProfileUI();
+  profileModal.classList.remove('open');
+});
+
+// Init
+displayDate();
+updateProfileUI();
 renderHabits();
