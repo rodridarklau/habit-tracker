@@ -4,19 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HabitFlow - Tracker de Hábitos</title>
-  <!-- Enlazamos la hoja de estilos dentro de la carpeta css -->
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <div class="container">
-    <!-- Encabezado con el título y propósito -->
+    <!-- Encabezado principal -->
     <header class="app-header">
       <h1>HabitFlow 🎯</h1>
       <p>Construye consistencia día a día</p>
     </header>
 
     <main class="main-content">
-      <!-- Formulario para ingresar un nuevo hábito -->
+      <!-- Sección del formulario para agregar hábitos -->
       <section class="habit-form-section">
         <h2>Nuevo Hábito</h2>
         <form id="habit-form">
@@ -31,17 +30,28 @@
         </form>
       </section>
 
-      <!-- Lista donde se mostrarán los hábitos creados -->
+      <!-- Panel de Estadísticas y Progreso Diario -->
+      <section class="progress-section">
+        <div class="progress-header">
+          <h2>Progreso de Hoy</h2>
+          <span id="progress-percentage">0%</span>
+        </div>
+        <div class="progress-bar-container">
+          <div id="progress-bar-fill" class="progress-bar-fill"></div>
+        </div>
+        <p id="progress-text" class="progress-text">0 de 0 hábitos completados</p>
+      </section>
+
+      <!-- Lista de Hábitos -->
       <section class="habits-list-section">
         <h2>Tus Hábitos</h2>
         <ul id="habits-list" class="habits-list">
-          <!-- JavaScript insertará los hábitos aquí dinámicamente -->
+          <!-- Elementos generados dinámicamente con JavaScript -->
         </ul>
       </section>
     </main>
   </div>
 
-  <!-- Enlazamos el archivo de lógica dentro de la carpeta js -->
   <script src="js/app.js"></script>
 </body>
 </html>
